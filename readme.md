@@ -34,8 +34,8 @@
    *Контейнер `api` автоматически дождется поднятия БД и применит все миграции Alembic.*
 
 3. **Доступные сервисы:**
-   - **Swagger UI (API):**[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-   - **RabbitMQ Management:**[http://127.0.0.1:15672](http://127.0.0.1:15672) (login: `rmuser`, password: `rmpassword`)
+   - **Swagger UI (API):** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+   - **RabbitMQ Management:** [http://127.0.0.1:15672](http://127.0.0.1:15672) (login: `rmuser`, password: `rmpassword`)
 
 ## 🧪 Как тестировать
 

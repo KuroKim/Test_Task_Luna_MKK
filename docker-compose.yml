@@ -1,0 +1,73 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: pay_user
+      POSTGRES_PASSWORD: pay_password
+      POSTGRES_DB: pay_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:["CMD-SHELL", "pg_isready -U pay_user -d pay_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Брокер сообщений
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: rmuser
+      RABBITMQ_DEFAULT_PASS: rmpassword
+    ports:
+      - "5672:5672"   # Порт для подключения кода
+      - "15672:15672" # Web-админка (логин: rmuser / rmpassword)
+    healthcheck:
+      test:["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - POSTGRES_SERVER=db
+      - POSTGRES_USER=pay_user
+      - POSTGRES_PASSWORD=pay_password
+      - POSTGRES_DB=pay_db
+      - RABBITMQ_URL=amqp://rmuser:rmpassword@rabbitmq:5672/
+      - API_KEY=my_super_secret_api_key
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  worker:
+    build: .
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - POSTGRES_SERVER=db
+      - POSTGRES_USER=pay_user
+      - POSTGRES_PASSWORD=pay_password
+      - POSTGRES_DB=pay_db
+      - RABBITMQ_URL=amqp://rmuser:rmpassword@rabbitmq:5672/
+      - API_KEY=my_super_secret_api_key
+    # FastStream запускается своей командой
+    command: faststream run app.worker.main:app
+
+volumes:
+  postgres_data:

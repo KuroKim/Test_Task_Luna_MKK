@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test:["CMD-SHELL", "pg_isready -U pay_user -d pay_db"]
+      test: ["CMD-SHELL", "pg_isready -U pay_user -d pay_db"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
       - "5672:5672"   # Порт для подключения кода
       - "15672:15672" # Web-админка (логин: rmuser / rmpassword)
     healthcheck:
-      test:["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5

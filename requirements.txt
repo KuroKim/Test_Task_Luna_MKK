@@ -5,7 +5,7 @@ asyncpg
 alembic
 pydantic
 pydantic-settings
-faststream[rabbit]
+faststream[rabbit,cli]
 httpx
 loguru
 python-dotenv
